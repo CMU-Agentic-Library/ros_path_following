@@ -4,3 +4,9 @@ install/
 log/
 .catkin_workspace
 *.swp
+
+# H1 run outputs and generated paths
+runs/
+h1_paths/
+h1_paths_uturn/
+__pycache__/
