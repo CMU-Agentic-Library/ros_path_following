@@ -1,0 +1,15 @@
+<launch>
+
+  <node pkg="path_sender" exec="pathSender" name="pathSender" output="screen">
+    <param name="pathFile1" value="$(find-pkg-prefix path_sender)/data/path_1.txt" />
+    <param name="pathFile2" value="$(find-pkg-prefix path_sender)/data/path_2.txt" />
+    <param name="pathFile3" value="$(find-pkg-prefix path_sender)/data/path_3.txt" />
+    <param name="goalYaw1" value="1.57" />
+    <param name="goalYaw2" value="3.14" />
+    <param name="goalYaw3" value="0.0" />
+    <param name="goalDelay" value="1.0" />
+    <param name="initDelay" value="1.0" />
+    <param name="looping" value="true" />
+  </node>
+
+</launch>

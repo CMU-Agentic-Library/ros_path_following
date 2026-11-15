@@ -1,0 +1,68 @@
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.launch_description_sources import PythonLaunchDescriptionSource, FrontendLaunchDescriptionSource
+from launch_ros.actions import Node
+from launch.substitutions import LaunchConfiguration 
+
+def generate_launch_description():
+  vehicleX = LaunchConfiguration('vehicleX')
+  vehicleY = LaunchConfiguration('vehicleY')
+  vehicleZ = LaunchConfiguration('vehicleZ')
+  vehicleYaw = LaunchConfiguration('vehicleYaw')
+
+  declare_vehicleX = DeclareLaunchArgument('vehicleX', default_value='0.0', description='')
+  declare_vehicleY = DeclareLaunchArgument('vehicleY', default_value='0.0', description='')
+  declare_vehicleZ = DeclareLaunchArgument('vehicleZ', default_value='0.0', description='')
+  declare_vehicleYaw = DeclareLaunchArgument('vehicleYaw', default_value='0.0', description='')
+
+  start_vehicle_simulator = Node(
+    package='vehicle_simulator', 
+    executable='vehicleSimulator',
+    parameters=[
+      {
+        'vehicleX': vehicleX,
+        'vehicleY': vehicleY,
+        'vehicleZ': vehicleZ,
+        'vehicleYaw': vehicleYaw,
+      }
+      ],
+      output='screen'
+  )
+
+  start_path_follower = IncludeLaunchDescription(
+    FrontendLaunchDescriptionSource(os.path.join(
+      get_package_share_directory('path_follower'), 'launch', 'path_follower.launch')
+    )
+  )
+
+  start_path_sender = IncludeLaunchDescription(
+    FrontendLaunchDescriptionSource(os.path.join(
+      get_package_share_directory('path_sender'), 'launch', 'path_sender.launch')
+    )
+  )
+
+  rviz_config_file = os.path.join(get_package_share_directory('vehicle_simulator'), 'rviz', 'vehicle_simulator.rviz')
+  start_rviz = Node(
+    package='rviz2',
+    executable='rviz2',
+    arguments=['-d', rviz_config_file],
+    output='screen'
+  )
+
+  ld = LaunchDescription()
+
+  # Add the actions
+  ld.add_action(declare_vehicleX)
+  ld.add_action(declare_vehicleY)
+  ld.add_action(declare_vehicleZ)
+  ld.add_action(declare_vehicleYaw)
+
+  ld.add_action(start_vehicle_simulator)
+  ld.add_action(start_path_follower)
+  ld.add_action(start_path_sender)
+  ld.add_action(start_rviz)
+
+  return ld
