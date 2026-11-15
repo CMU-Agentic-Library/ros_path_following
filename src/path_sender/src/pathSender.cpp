@@ -64,7 +64,8 @@ nav_msgs::msg::Path path1, path2, path3;
 
 int readPath(string pathFile, nav_msgs::msg::Path &path, float goalYaw)
 {
-  pathFile.replace(pathFile.find("/install/"), 8, "/src");
+  size_t installPos = pathFile.find("/install/");
+  if (installPos != string::npos) pathFile.replace(installPos, 8, "/src");
   FILE *pathFilePtr = fopen(pathFile.c_str(), "r");
 
   int val1, val2, val3;
