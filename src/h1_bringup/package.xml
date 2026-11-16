@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>h1_bringup</name>
+  <version>0.0.1</version>
+  <description>Real-robot launch files for path following on the Zeno H1, and the /cmd_vel to zeno_h1_motion_control bridge.</description>
+  <maintainer email="noreply@example.com">maintainer</maintainer>
+  <license>BSD</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>zeno_h1_msgs</depend>
+  <depend>livox_ros_driver2</depend>
+
+  <exec_depend>path_follower</exec_depend>
+  <exec_depend>path_sender</exec_depend>
+  <exec_depend>arise_slam_mid360</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
