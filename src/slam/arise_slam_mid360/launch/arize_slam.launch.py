@@ -49,6 +49,19 @@ def generate_launch_description():
         "sensor_frame_rot",
         default_value="sensor_rot",
     )
+    lidar_topic_arg = DeclareLaunchArgument(
+        "lidar_topic",
+        default_value="/livox/lidar",
+        description="livox_ros_driver2/CustomMsg point cloud",
+    )
+    imu_topic_arg = DeclareLaunchArgument(
+        "imu_topic",
+        default_value="/livox/imu",
+    )
+    topics = {
+        "laser_topic": LaunchConfiguration("lidar_topic"),
+        "imu_topic": LaunchConfiguration("imu_topic"),
+    }
 
     feature_extraction_node = Node(
         package="arise_slam_mid360",
@@ -59,7 +72,7 @@ def generate_launch_description():
         },
         parameters=[LaunchConfiguration("config_file"),
             { "calibration_file": LaunchConfiguration("calibration_file"),
-        }],
+        }, topics],
     )
 
     laser_mapping_node = Node(
@@ -87,7 +100,7 @@ def generate_launch_description():
         },
         parameters=[LaunchConfiguration("config_file"),
             { "calibration_file": LaunchConfiguration("calibration_file")
-        }],
+        }, topics],
     )
 
     
@@ -100,6 +113,8 @@ def generate_launch_description():
         world_frame_rot_arg,
         sensor_frame_arg,
         sensor_frame_rot_arg,
+        lidar_topic_arg,
+        imu_topic_arg,
         feature_extraction_node,
         laser_mapping_node,
         imu_preintegration_node,
