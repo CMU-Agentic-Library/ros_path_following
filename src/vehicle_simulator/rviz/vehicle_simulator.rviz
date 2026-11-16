@@ -27,16 +27,16 @@ Visualization Manager:
   Displays:
     - Class: rviz_default_plugins/Axes
       Enabled: false
-      Length: 0.75
+      Length: 0.30000001192092896
       Name: Sensor
-      Radius: 0.125
+      Radius: 0.05000000074505806
       Reference Frame: sensor
       Value: false
     - Class: rviz_default_plugins/Axes
       Enabled: true
-      Length: 1
+      Length: 0.5
       Name: Vehicle
-      Radius: 0.10000000149011612
+      Radius: 0.05000000074505806
       Reference Frame: vehicle
       Value: true
     - Alpha: 1
@@ -45,7 +45,7 @@ Visualization Manager:
       Enabled: true
       History Length: 1
       Name: LookAhead
-      Radius: 0.25
+      Radius: 0.15000000596046448
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -97,16 +97,16 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 6.195341110229492
+      Distance: 4.221951007843018
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 2.9542295932769775
-        Y: 0.7122012972831726
-        Z: 2.7072441577911377
+        X: 2.216308832168579
+        Y: 0.5211644768714905
+        Z: 2.706502914428711
       Focal Shape Fixed Size: false
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
