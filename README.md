@@ -65,6 +65,7 @@ AUTO 是 motion_control 里优先级最低的模式，手柄、VR、全身遥操
 | `h1_bringup` | 上位机 | 机器人用的 launch 文件、`cmdVelToMotionControl` |
 | `arise_slam_mid360`、`arise_slam_mid360_msgs` | 上位机 | 激光-惯性 SLAM，发布 `/state_estimation` 和 TF `map` → `sensor`（来自 autonomy_stack_malo） |
 | `livox_ros_driver2` | 上位机 | 只包含 Livox 的消息定义（`CustomMsg`），驱动本身在下位机上运行 |
+| `zeno_h1_msgs` | 上位机 | H1 的消息定义，`cmdVelToMotionControl` 用到其中的 `MotionDecisionState`。拷贝自 zeno_h1_msgs 的 `dev/ros2` 分支（commit `7d1fff4`），下位机的消息定义改了要同步过来 |
 | [`src/slam/dependency`](src/slam/dependency) | 上位机 | arise_slam 用到的 Sophus 1.1、Ceres 2.2、GTSAM 4.3 源码。它们不是 ROS 包，colcon 会跳过 |
 | `vehicle_simulator` | 上位机 | 带 RViz 的仿真车，没有机器人时用来测试 |
 
@@ -74,7 +75,6 @@ AUTO 是 motion_control 里优先级最低的模式，手柄、VR、全身遥操
 
 ### 1. 依赖
 
-- **`zeno_h1_msgs`**：用 ROS 2 分支（`dev/ros2`；`master` 是 ROS 1），放在本工作空间的 `src/` 里或者 underlay 里。上位机只需要它的消息定义。
 - **系统包：**
 
   ```bash

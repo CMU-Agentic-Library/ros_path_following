@@ -1,0 +1,12 @@
+# 使能电机服务
+# 请求使能/失能指定电机或所有电机
+
+# 请求
+string motor_id          # 电机标识符（空字符串表示所有电机）
+bool enable              # true为使能，false为失能
+
+---
+# 响应
+bool success             # 操作是否成功
+string message           # 状态消息
+

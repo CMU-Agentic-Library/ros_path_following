@@ -1,0 +1,11 @@
+# 设置电机零点服务
+# 将电机当前位置设为零点
+
+# 请求
+string motor_id    # 电机标识符（例如："left_arm_j0"，空字符串表示所有电机）
+
+---
+
+# 响应
+bool success       # 操作是否成功
+string message     # 响应消息（成功或错误信息）
