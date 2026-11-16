@@ -6,8 +6,8 @@ feature_extraction_node:
         use_sim_time: false
         PROJECT_NAME: ""
 
-        imu_topic: "/imu/data"
-        laser_topic: "/lidar/scan"  #velodyne_points  #/livox/lidar /lidar/scan
+        imu_topic: "/livox/imu"
+        laser_topic: "/livox/lidar"  # lower computer Livox driver, CustomMsg
         odom_topic: "/dummy"
         depthup_topic: "/rs_up/depth/cloud_filtered"
         depthdown_topic: "/rs_down/depth/cloud_filtered"
@@ -59,8 +59,8 @@ laser_mapping_node:
         use_sim_time: false
         PROJECT_NAME: ""
 
-        imu_topic: "imu/data"
-        laser_topic: "velodyne_points"
+        imu_topic: "/livox/imu"
+        laser_topic: "/livox/lidar"
         odom_topic: "integrated_to_init"
         depthup_topic: "/rs_up/depth/cloud_filtered"
         depthdown_topic: "/rs_down/depth/cloud_filtered"
@@ -105,8 +105,8 @@ imu_preintegration_node:
         use_sim_time: false
         PROJECT_NAME: ""
         sensor: "livox"
-        imu_topic: "/imu/data"
-        laser_topic: "/lidar/scan"
+        imu_topic: "/livox/imu"
+        laser_topic: "/livox/lidar"
         odom_topic:  "integrated_to_init"
         depthup_topic: "/rs_up/depth/cloud_filtered"
         depthdown_topic: "/rs_down/depth/cloud_filtered"

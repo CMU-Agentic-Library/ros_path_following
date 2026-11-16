@@ -14,7 +14,6 @@
   <depend>geometry_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>zeno_h1_msgs</depend>
-  <depend>livox_ros_driver2</depend>
 
   <exec_depend>path_follower</exec_depend>
   <exec_depend>path_sender</exec_depend>
