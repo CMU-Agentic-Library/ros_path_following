@@ -1,0 +1,15 @@
+int32 motor_index
+float64 hit_velocity_threshold
+float64 hit_torque_threshold
+float64 hit_hold_time
+float64 collision_velocity
+float64 seek_torque_limit
+float64 reverse_angle_deg
+float64 reverse_velocity
+float64 settle_velocity_threshold
+float64 settle_hold_time
+---
+bool success
+string message
+float64 hit_position
+float64 zero_set_position
