@@ -40,14 +40,15 @@ const double PI = 3.1415926;
 
 double sensorOffsetX = 0;
 double sensorOffsetY = 0;
-double lookAheadDis = 0.5;
-double speed = 0.5;
-double accel = 0.5;
-double slowDwnDis = 1.0;
-double yawRate = 1.0;
-double yawRateGain = 1.0;
-double goalYawDis = 1.0;
-double goalStopDis = 0.05;
+double lookAheadDis = 0.3;
+double speed = 0.4;
+double accel = 1.0;
+double yawRate = 0.6;
+double slowDis = 0.3;
+double slowAngle = 0.3;
+double stopDis = 0.02;
+double stopAngle = 0.04;
+double goalYawDis = 0.5;
 
 float vehicleX = 0;
 float vehicleY = 0;
@@ -106,7 +107,7 @@ void pathHandler(const nav_msgs::msg::Path::ConstSharedPtr pathIn)
   float disX = path->points[pathSize - 1].x - path->points[slowDwnPointID].x;
   float disY = path->points[pathSize - 1].y - path->points[slowDwnPointID].y;
   float dis = sqrt(disX * disX + disY * disY);
-  while (dis < slowDwnDis && slowDwnPointID > 0) {
+  while (dis < slowDis && slowDwnPointID > 0) {
     slowDwnPointID--;
     disX = path->points[pathSize - 1].x - path->points[slowDwnPointID].x;
     disY = path->points[pathSize - 1].y - path->points[slowDwnPointID].y;
@@ -135,22 +136,24 @@ int main(int argc, char** argv)
   nh->declare_parameter<double>("lookAheadDis", lookAheadDis);
   nh->declare_parameter<double>("speed", speed);
   nh->declare_parameter<double>("accel", accel);
-  nh->declare_parameter<double>("slowDwnDis", slowDwnDis);
   nh->declare_parameter<double>("yawRate", yawRate);
-  nh->declare_parameter<double>("yawRateGain", yawRateGain);
+  nh->declare_parameter<double>("slowDis", slowDis);
+  nh->declare_parameter<double>("slowAngle", slowAngle);
+  nh->declare_parameter<double>("stopDis", stopDis);
+  nh->declare_parameter<double>("stopAngle", stopAngle);
   nh->declare_parameter<double>("goalYawDis", goalYawDis);
-  nh->declare_parameter<double>("goalStopDis", goalStopDis);
 
   nh->get_parameter("sensorOffsetX", sensorOffsetX);
   nh->get_parameter("sensorOffsetY", sensorOffsetY);
   nh->get_parameter("lookAheadDis", lookAheadDis);
   nh->get_parameter("speed", speed);
   nh->get_parameter("accel", accel);
-  nh->get_parameter("slowDwnDis", slowDwnDis);
   nh->get_parameter("yawRate", yawRate);
-  nh->get_parameter("yawRateGain", yawRateGain);
+  nh->get_parameter("slowDis", slowDis);
+  nh->get_parameter("slowAngle", slowAngle);
+  nh->get_parameter("stopDis", stopDis);
+  nh->get_parameter("stopAngle", stopAngle);
   nh->get_parameter("goalYawDis", goalYawDis);
-  nh->get_parameter("goalStopDis", goalStopDis);
 
   auto subOdom = nh->create_subscription<nav_msgs::msg::Odometry>("/state_estimation", 5, odomHandler);
 
@@ -192,9 +195,15 @@ int main(int argc, char** argv)
         float disGoalX = path->points[pathSize - 1].x - vehicleX;
         float disGoalY = path->points[pathSize - 1].y - vehicleY;
         disGoal = sqrt(disGoalX * disGoalX + disGoalY * disGoalY);
-        if (disGoal < slowDwnDis) speedRamped *= disGoal / slowDwnDis;
-        if (disGoal < goalStopDis) speedRamped = 0;
+        if (disGoal < slowDis) speedRamped *= disGoal / slowDis;
+        if (disGoal < stopDis) speedRamped = 0;
       }
+
+      //Add obstacle stopping, implement 1) or 2)
+      /*if (disGoal > stopDis) {
+        1) Short distance obstacle checking - Note that disX and disY represent the vehicle moving direction, in a rectangle whose long direction is the vehicle moving direction and the width of the rectangle is the width of the vehicle, check if the number of registered lidar points (ground and ceiling removed) exceeds a threshold, if yes set speedRamped = 0.
+        2) Long distance obstacle checking - Note that path->points[pathPointID] is the look ahead, take the path points within a certain range before and after the look ahead, check the number of registered lidar points (ground and ceiling removed) whose distances to the closest path points are less than the vehicle width / 2, if the number of registered lidar points exceeds a threshold, set speedRamped = 0.
+      }*/
 
       if (vehicleSpeed < speedRamped) vehicleSpeed += accel / 100.0;
       else if (vehicleSpeed > speedRamped) vehicleSpeed -= accel / 100.0;
@@ -211,11 +220,11 @@ int main(int argc, char** argv)
       if (disYaw < -PI) disYaw += 2 * PI;
       else if (disYaw > PI) disYaw -= 2 * PI;
 
-      float vehicleYawRate = yawRateGain * disYaw;
-      if (vehicleYawRate < -yawRate) vehicleYawRate = -yawRate;
-      else if (vehicleYawRate > yawRate) vehicleYawRate = yawRate;
+      float vehicleYawRate = yawRate / slowAngle * disYaw;
+      if (disYaw < -slowAngle) vehicleYawRate = -yawRate;
+      else if (disYaw > slowAngle) vehicleYawRate = yawRate;
 
-      if (disGoal < goalStopDis && fabs(vehicleSpeed) < accel / 100.0 && fabs(vehicleYawRate) < yawRate / 100.0 && !goalReach) {
+      if (disGoal < stopDis && fabs(vehicleSpeed) < accel / 100.0 && fabs(disYaw) < stopAngle && !goalReach) {
         pubGoalReach->publish(goalReachMsg);
         goalReach = true;
       }

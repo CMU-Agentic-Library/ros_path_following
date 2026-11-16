@@ -1,19 +1,20 @@
 <launch>
 
-  <arg name="sensorOffsetX" default="0.0"/>
+  <arg name="sensorOffsetX" default="0.12"/>
   <arg name="sensorOffsetY" default="0.0"/>
 
   <node pkg="path_follower" exec="pathFollower" name="pathFollower" output="screen">
     <param name="sensorOffsetX" value="$(var sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(var sensorOffsetY)" />
     <param name="lookAheadDis" value="0.3" />
-    <param name="speed" value="0.5" />
-    <param name="accel" value="0.5" />
-    <param name="slowDwnDis" value="0.5" />
-    <param name="yawRate" value="0.75" />
-    <param name="yawRateGain" value="2.0" />
-    <param name="goalYawDis" value="1.0" />
-    <param name="goalStopDis" value="0.05" />
+    <param name="speed" value="0.4" />
+    <param name="accel" value="1.0" />
+    <param name="yawRate" value="0.6" />
+    <param name="slowDis" value="0.3" />
+    <param name="slowAngle" value="0.3" />
+    <param name="stopDis" value="0.02" />
+    <param name="stopAngle" value="0.04" />
+    <param name="goalYawDis" value="0.5" />
   </node>
 
   <node pkg="tf2_ros" exec="static_transform_publisher" name="vehicleTransPublisher" args="-$(var sensorOffsetX) -$(var sensorOffsetY) 0 0 0 0 /sensor /vehicle"/>
