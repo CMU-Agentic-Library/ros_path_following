@@ -19,6 +19,7 @@
   <exec_depend>path_sender</exec_depend>
   <exec_depend>arise_slam_mid360</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>rviz2</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

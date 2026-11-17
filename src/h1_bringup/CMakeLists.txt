@@ -22,6 +22,6 @@ ament_target_dependencies(cmdVelToMotionControl rclcpp std_msgs nav_msgs geometr
 
 
 install(TARGETS cmdVelToMotionControl DESTINATION lib/${PROJECT_NAME})
-install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch rviz DESTINATION share/${PROJECT_NAME})
 
 ament_package()
