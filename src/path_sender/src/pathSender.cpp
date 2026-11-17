@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 
   auto pubPath = nh->create_publisher<nav_msgs::msg::Path>("/path", 5);
 
-  auto subOdom = nh->create_subscription<nav_msgs::msg::Odometry>("/Odometry", 5, odomHandler);
+  auto subOdom = nh->create_subscription<nav_msgs::msg::Odometry>("/state_estimation", 5, odomHandler);
 
   auto subGoalReach = nh->create_subscription<std_msgs::msg::Empty>("/goal_reach", 5, goalReachHandler);
 

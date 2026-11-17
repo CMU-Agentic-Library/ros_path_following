@@ -60,7 +60,7 @@ public:
         });
 
     subOdom_ = create_subscription<nav_msgs::msg::Odometry>(
-        "/Odometry", 5, [this](nav_msgs::msg::Odometry::ConstSharedPtr) {
+        "/state_estimation", 5, [this](nav_msgs::msg::Odometry::ConstSharedPtr) {
           lastOdom_ = now();
           gotOdom_ = true;
         });
