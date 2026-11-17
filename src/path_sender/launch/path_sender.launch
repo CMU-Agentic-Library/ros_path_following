@@ -8,7 +8,7 @@
     <param name="goalYaw2" value="3.14" />
     <param name="goalYaw3" value="0.0" />
     <param name="goalDelay" value="1.0" />
-    <param name="initDelay" value="1.0" />
+    <param name="initDelay" value="3.0" />
     <param name="looping" value="true" />
   </node>
 
