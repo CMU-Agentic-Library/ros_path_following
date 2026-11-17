@@ -11,8 +11,6 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     return LaunchDescription([
-        DeclareLaunchArgument('maxLinear', default_value='0.2', description='m/s'),
-        DeclareLaunchArgument('maxAngular', default_value='1.0', description='rad/s'),
         DeclareLaunchArgument('checkOdom', default_value='true',
                               description='release AUTO when /state_estimation is stale'),
 
@@ -20,8 +18,6 @@ def generate_launch_description():
             package='h1_bringup', executable='cmdVelToMotionControl', name='cmdVelToMotionControl',
             output='screen',
             parameters=[{
-                'maxLinear': LaunchConfiguration('maxLinear'),
-                'maxAngular': LaunchConfiguration('maxAngular'),
                 'checkOdom': LaunchConfiguration('checkOdom'),
                 'cmdTimeout': 0.25,
                 'odomTimeout': 0.3,

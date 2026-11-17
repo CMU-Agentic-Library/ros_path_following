@@ -17,7 +17,6 @@
 //
 // AUTO is the lowest-priority mode in motion_control: joystick / VR / wholebody teleop override it.
 
-#include <algorithm>
 #include <array>
 #include <cmath>
 
@@ -44,8 +43,6 @@ public:
     odomTimeout_ = declare_parameter<double>("odomTimeout", 0.3);
     jointTimeout_ = declare_parameter<double>("jointTimeout", 0.5);
     checkOdom_ = declare_parameter<bool>("checkOdom", true);
-    maxLinear_ = declare_parameter<double>("maxLinear", 0.2);
-    maxAngular_ = declare_parameter<double>("maxAngular", 1.0);
     releaseDuration_ = declare_parameter<double>("releaseDuration", 0.5);
     const double rate = declare_parameter<double>("publishRate", 50.0);
     const auto autoTopic = declare_parameter<std::string>("autoTopic", "/zeno/h1/auto/wholebody/cmd");
@@ -92,8 +89,8 @@ public:
 
     timer_ = create_wall_timer(std::chrono::duration<double>(1.0 / rate), [this]() { tick(); });
 
-    RCLCPP_INFO(get_logger(), "Publishing on %s, maxLinear %.2f m/s, maxAngular %.2f rad/s, cmdTimeout %.2f s.",
-                autoTopic.c_str(), maxLinear_, maxAngular_, cmdTimeout_);
+    RCLCPP_INFO(get_logger(), "Publishing on %s, cmdTimeout %.2f s.",
+                autoTopic.c_str(), cmdTimeout_);
   }
 
   // Send mode 0: motion_control zeros the chassis and leaves AUTO (only acts if AUTO is active).
@@ -160,16 +157,8 @@ private:
     }
 
     if (active) {
-      double vx = vx_, vy = vy_;
-      // Scale the planar velocity as a vector so the driving direction is preserved.
-      const double v = std::hypot(vx, vy);
-      if (v > maxLinear_) {
-        vx *= maxLinear_ / v;
-        vy *= maxLinear_ / v;
-      }
-      const double wz = std::clamp(wz_, -maxAngular_, maxAngular_);
-      if (std::isfinite(vx) && std::isfinite(vy) && std::isfinite(wz)) {
-        pubAuto_->publish(makeMsg(1, vx, vy, wz));
+      if (std::isfinite(vx_) && std::isfinite(vy_) && std::isfinite(wz_)) {
+        pubAuto_->publish(makeMsg(1, vx_, vy_, wz_));
         lastActive_ = t;
         wasActive_ = true;
         return;
@@ -188,7 +177,7 @@ private:
     }
   }
 
-  double cmdTimeout_, odomTimeout_, jointTimeout_, maxLinear_, maxAngular_, releaseDuration_;
+  double cmdTimeout_, odomTimeout_, jointTimeout_, releaseDuration_;
   bool checkOdom_;
 
   double vx_ = 0, vy_ = 0, wz_ = 0;
