@@ -55,7 +55,7 @@ namespace arise_slam {
         // pubImuOdometry = this->create_publisher<nav_msgs::msg::Odometry>(
         //     ProjectName+"/integrated_to_init_incremental", 10);
         pubImuOdometry2 = this->create_publisher<nav_msgs::msg::Odometry>(
-            ProjectName+"/Odometry", 10);
+            ProjectName+"/state_estimation", 10);
         pubHealthStatus = this->create_publisher<std_msgs::msg::Bool>(
             ProjectName+"/state_estimation_health", 1);
         pubImuPath = this->create_publisher<nav_msgs::msg::Path>(
