@@ -60,7 +60,7 @@ def generate_launch_description():
   ld.add_action(declare_vehicleZ)
   ld.add_action(declare_vehicleYaw)
 
-  ld.add_action(start_vehicle_simulator)
+  #ld.add_action(start_vehicle_simulator)
   ld.add_action(start_path_follower)
   ld.add_action(start_path_sender)
   ld.add_action(start_rviz)

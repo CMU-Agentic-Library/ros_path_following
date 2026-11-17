@@ -25,7 +25,7 @@ def generate_launch_description():
                 'pathFile1': os.path.join(data, 'path_1.txt'),
                 'pathFile2': os.path.join(data, 'path_2.txt'),
                 'pathFile3': os.path.join(data, 'path_3.txt'),
-                'goalYaw1': 1.57, 'goalYaw2': 3.14, 'goalYaw3': 0.0,
+                'goalYaw1': 1.57, 'goalYaw2': -1.57, 'goalYaw3': 0.0,
                 'goalDelay': 2.0, 'initDelay': 2.0,
                 'looping': LaunchConfiguration('looping'),
             }],
