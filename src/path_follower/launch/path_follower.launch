@@ -6,13 +6,13 @@
   <node pkg="path_follower" exec="pathFollower" name="pathFollower" output="screen">
     <param name="sensorOffsetX" value="$(var sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(var sensorOffsetY)" />
-    <param name="lookAheadDis" value="0.3" />
+    <param name="lookAheadDis" value="0.2" />
     <param name="speed" value="0.4" />
-    <param name="accel" value="1.0" />
+    <param name="accel" value="0.5" />
     <param name="yawRate" value="0.6" />
-    <param name="slowDis" value="0.3" />
+    <param name="slowDis" value="0.4" />
     <param name="slowAngle" value="0.3" />
-    <param name="stopDis" value="0.02" />
+    <param name="stopDis" value="0.05" />
     <param name="stopAngle" value="0.04" />
     <param name="goalYawDis" value="0.5" />
   </node>

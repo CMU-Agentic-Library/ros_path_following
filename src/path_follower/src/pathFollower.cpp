@@ -42,11 +42,11 @@ double sensorOffsetX = 0;
 double sensorOffsetY = 0;
 double lookAheadDis = 0.3;
 double speed = 0.4;
-double accel = 1.0;
+double accel = 0.5;
 double yawRate = 0.6;
-double slowDis = 0.3;
+double slowDis = 0.4;
 double slowAngle = 0.3;
-double stopDis = 0.02;
+double stopDis = 0.05;
 double stopAngle = 0.04;
 double goalYawDis = 0.5;
 
