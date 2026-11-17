@@ -12,13 +12,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(zeno_h1_msgs REQUIRED)
 
 add_executable(cmdVelToMotionControl src/cmdVelToMotionControl.cpp)
-ament_target_dependencies(cmdVelToMotionControl rclcpp std_msgs nav_msgs geometry_msgs sensor_msgs zeno_h1_msgs)
+ament_target_dependencies(cmdVelToMotionControl rclcpp std_msgs geometry_msgs)
 
 
 install(TARGETS cmdVelToMotionControl DESTINATION lib/${PROJECT_NAME})

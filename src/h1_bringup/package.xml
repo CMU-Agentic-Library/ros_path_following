@@ -10,10 +10,7 @@
 
   <depend>rclcpp</depend>
   <depend>std_msgs</depend>
-  <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>sensor_msgs</depend>
-  <depend>zeno_h1_msgs</depend>
 
   <exec_depend>path_follower</exec_depend>
   <exec_depend>path_sender</exec_depend>
