@@ -259,6 +259,9 @@ int main(int argc, char** argv)
         }
       }
 
+      lookAheadX = disX;
+      lookAheadY = disY;
+
       float disGoal = 1000.0;
       float speedRamped = speed;
       if (pathPointID >= slowDwnPointID) {
@@ -269,19 +272,9 @@ int main(int argc, char** argv)
         if (disGoal < stopDis) speedRamped = 0;
       }
 
-      //Add obstacle stopping, implement 1) or 2)
-      /*if (disGoal > stopDis) {
-        1) Short distance obstacle checking - Note that lookAheadX and lookAheadY represent the vehicle moving direction, in a rectangle whose long direction is the vehicle moving direction and the width of the rectangle is the width of the vehicle, check if the number of registered lidar points (ground and ceiling removed) exceeds a threshold, if yes set speedRamped = 0.
-        2) Long distance obstacle checking - Note that path->points[pathPointID] is the look ahead, take the path points within a certain range before and after the look ahead, check the number of registered lidar points (ground and ceiling removed) whose distances to the closest path points are less than the vehicle width / 2, if the number of registered lidar points exceeds a threshold, set speedRamped = 0.
-      }*/
-
-      //Obstacle stopping 1) from laserCloudHandler() callback function
-      lookAheadX = disX;
-      lookAheadY = disY;
-      if (collisionPointCount >= collisionPointThre) speedRamped = 0;
-
       if (vehicleSpeed < speedRamped) vehicleSpeed += accel / 100.0;
       else if (vehicleSpeed > speedRamped) vehicleSpeed -= accel / 100.0;
+      if (collisionPointCount >= collisionPointThre) vehicleSpeed = 0;
 
       if (dis < 0.001) dis = 0.001;
       float vehicleFwdSpeed = (disX * cos(vehicleYaw) + disY * sin(vehicleYaw)) / dis * vehicleSpeed;
@@ -299,8 +292,6 @@ int main(int argc, char** argv)
       float vehicleYawRate = yawRate / slowAngle * disYaw;
       if (disYaw < -slowAngle) vehicleYawRate = -yawRate;
       else if (disYaw > slowAngle) vehicleYawRate = yawRate;
-
-      //Obstacle stopping 1) from laserCloudHandler() callback function
       if (collisionPointCount >= collisionPointThre) vehicleYawRate = 0;
 
       if (disGoal < stopDis && fabs(vehicleSpeed) < accel / 100.0 && fabs(disYaw) < stopAngle && !goalReach) {
@@ -334,3 +325,9 @@ int main(int argc, char** argv)
 
   return 0;
 }
+
+//Add obstacle stopping, implement 1) or 2). Currently 1) is implemented in laserCloudHandler() callback
+/*if (disGoal > stopDis) {
+  1) Short distance obstacle checking - Note that lookAheadX and lookAheadY represent the vehicle moving direction, in a rectangle whose long direction is the vehicle moving direction and the width of the rectangle is the width of the vehicle, check if the number of registered lidar points (ground and ceiling removed) exceeds a threshold, if yes set vehicleSpeed = 0.
+  2) Long distance obstacle checking - Note that path->points[pathPointID] is the look ahead, take the path points within a certain range before and after the look ahead, check the number of registered lidar points (ground and ceiling removed) whose distances to the closest path points are less than the vehicle width / 2, if the number of registered lidar points exceeds a threshold, set vehicleSpeed = 0.
+}*/
