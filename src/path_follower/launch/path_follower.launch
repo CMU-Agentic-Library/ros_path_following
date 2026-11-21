@@ -18,7 +18,7 @@
     <param name="collisionRadiusFromCenter" value="0.3" />
     <param name="collisionCenterDis" value="0.3" />
     <param name="collisionPointThre" value="5" />
-    <param name="collisionStop" value="false" />
+    <param name="collisionStop" value="true" />
   </node>
   <node pkg="tf2_ros" exec="static_transform_publisher" name="vehicleTransPublisher" args="-$(var sensorOffsetX) -$(var sensorOffsetY) 0 0 0 0 /sensor /vehicle"/>
 </launch>

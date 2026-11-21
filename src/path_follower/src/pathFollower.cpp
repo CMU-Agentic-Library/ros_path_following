@@ -276,9 +276,10 @@ int main(int argc, char** argv)
         if (disGoal < stopDis) speedRamped = 0;
       }
 
+      if (collisionPointCount >= collisionPointThre) speedRamped = 0;
       if (vehicleSpeed < speedRamped) vehicleSpeed += accel / 100.0;
       else if (vehicleSpeed > speedRamped) vehicleSpeed -= accel / 100.0;
-      if (collisionPointCount >= collisionPointThre) vehicleSpeed = 0;
+   
 
       if (dis < 0.001) dis = 0.001;
       float vehicleFwdSpeed = (disX * cos(vehicleYaw) + disY * sin(vehicleYaw)) / dis * vehicleSpeed;

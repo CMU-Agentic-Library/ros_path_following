@@ -24,7 +24,7 @@ feature_extraction_node:
         lidar_roll: 0.0
         lidar_pitch: 0.35
         blindFront: 0.1
-        blindBack: -0.4
+        blindBack: -0.35
         blindLeft: 0.25
         blindRight: -0.25
         blindDiskLow: -0.05
