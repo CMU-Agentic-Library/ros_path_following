@@ -42,11 +42,11 @@ double sensorOffsetX = 0;
 double sensorOffsetY = 0;
 double lookAheadDis = 0.3;
 double speed = 0.4;
-double accel = 0.5;
+double accel = 1.0;
 double yawRate = 0.6;
-double slowDis = 0.4;
+double slowDis = 0.3;
 double slowAngle = 0.3;
-double stopDis = 0.05;
+double stopDis = 0.02;
 double stopAngle = 0.04;
 double goalYawDis = 0.5;
 
@@ -236,8 +236,8 @@ int main(int argc, char** argv)
       cmd_vel.twist.linear.y = 0;
       cmd_vel.twist.angular.z = vehicleYawRate;
       if (fabs(vehicleSpeed) > accel / 100.0) {
-        cmd_vel.twist.linear.x = vehicleFwdSpeed;
-        cmd_vel.twist.linear.y = vehicleLeftSpeed;
+        cmd_vel.twist.linear.x = vehicleSpeed;
+        cmd_vel.twist.linear.y = 0;
       }
       pubSpeed->publish(cmd_vel);
       
