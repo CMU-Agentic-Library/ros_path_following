@@ -51,7 +51,8 @@ double stopAngle = 0.04;
 double goalYawDis = 0.5;
 double minRelZ = -0.15;
 double maxRelZ = 1.5;
-double collisionRadiusFromLookAhead = 0.3;
+double collisionRadiusFromCenter = 0.3;
+double collisionCenterDis = 0.3;
 int collisionPointThre = 5;
 int collisionPointCount = 0;
 bool collisionStop = false;
@@ -109,7 +110,8 @@ void laserCloudHandler(const sensor_msgs::msg::PointCloud2::ConstSharedPtr laser
   float sinLookAhead = lookAheadY / dis;
   float cosLookAhead = lookAheadX / dis;
 
-  if (dis > lookAheadDis) dis = lookAheadDis;
+  dis *= collisionCenterDis / lookAheadDis;
+  if (dis > collisionCenterDis) dis = collisionCenterDis;
 
   laserCloudCrop->clear();
   collisionPointCount = 0;
@@ -125,8 +127,8 @@ void laserCloudHandler(const sensor_msgs::msg::PointCloud2::ConstSharedPtr laser
 
     float pointToLookAhead = sqrt((pointX2 - dis) * (pointX2 - dis) + pointY2 * pointY2);
 
-    if (((pointX2 > 0 && pointX2 < dis && fabs(pointY2) < collisionRadiusFromLookAhead) || 
-        (pointX2 >= dis && pointToLookAhead < collisionRadiusFromLookAhead)) && (pointZ2 > minRelZ && pointZ2 < maxRelZ)) {
+    if (((pointX2 > 0 && pointX2 < dis && fabs(pointY2) < collisionRadiusFromCenter) || 
+        (pointX2 >= dis && pointToLookAhead < collisionRadiusFromCenter)) && (pointZ2 > minRelZ && pointZ2 < maxRelZ)) {
       laserCloudCrop->push_back(laserCloud->points[i]);
       collisionPointCount++;
     }
@@ -200,7 +202,8 @@ int main(int argc, char** argv)
   nh->declare_parameter<double>("goalYawDis", goalYawDis);
   nh->declare_parameter<double>("minRelZ", minRelZ);
   nh->declare_parameter<double>("maxRelZ", maxRelZ);
-  nh->declare_parameter<double>("collisionRadiusFromLookAhead", collisionRadiusFromLookAhead);
+  nh->declare_parameter<double>("collisionRadiusFromCenter", collisionRadiusFromCenter);
+  nh->declare_parameter<double>("collisionCenterDis", collisionCenterDis);
   nh->declare_parameter<int>("collisionPointThre", collisionPointThre);
   nh->declare_parameter<bool>("collisionStop", collisionStop);
 
@@ -217,7 +220,8 @@ int main(int argc, char** argv)
   nh->get_parameter("goalYawDis", goalYawDis);
   nh->get_parameter("minRelZ", minRelZ);
   nh->get_parameter("maxRelZ", maxRelZ);
-  nh->get_parameter("collisionRadiusFromLookAhead", collisionRadiusFromLookAhead);
+  nh->get_parameter("collisionRadiusFromCenter", collisionRadiusFromCenter);
+  nh->get_parameter("collisionCenterDis", collisionCenterDis);
   nh->get_parameter("collisionPointThre", collisionPointThre);
   nh->get_parameter("collisionStop", collisionStop);
 
