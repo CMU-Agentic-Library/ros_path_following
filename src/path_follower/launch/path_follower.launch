@@ -6,7 +6,7 @@
   <node pkg="path_follower" exec="pathFollower" name="pathFollower" output="screen">
     <param name="sensorOffsetX" value="$(var sensorOffsetX)" />
     <param name="sensorOffsetY" value="$(var sensorOffsetY)" />
-    <param name="lookAheadDis" value="0.2" />
+    <param name="lookAheadDis" value="0.15" />
     <param name="speed" value="0.4" />
     <param name="accel" value="0.5" />
     <param name="yawRate" value="0.6" />
@@ -15,6 +15,11 @@
     <param name="stopDis" value="0.05" />
     <param name="stopAngle" value="0.04" />
     <param name="goalYawDis" value="0.5" />
+    <param name="minRelZ" value="-0.15" />
+    <param name="maxRelZ" value="1.5" />
+    <param name="collisionRadiusFromLookAhead" value="0.3" />
+    <param name="collisionPointThre" value="5" />
+    <param name="collisionStop" value="true" />
   </node>
 
   <node pkg="tf2_ros" exec="static_transform_publisher" name="vehicleTransPublisher" args="-$(var sensorOffsetX) -$(var sensorOffsetY) 0 0 0 0 /sensor /vehicle"/>
