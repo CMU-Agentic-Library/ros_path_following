@@ -18,18 +18,18 @@ feature_extraction_node:
 
         scan_line: 4 #16 64
         sensor: "livox"
-        mapping_skip_frame: 1
+        mapping_skip_frame: 2
         lidar_flip: false
         fixed_lidar_roll_pitch: false
         lidar_roll: 0.0
         lidar_pitch: 0.35
         blindFront: 0.1
-        blindBack: -0.2
-        blindLeft: 0.1
-        blindRight: -0.1
+        blindBack: -0.4
+        blindLeft: 0.25
+        blindRight: -0.25
         blindDiskLow: -0.05
         blindDiskHigh: 0.05
-        blindDiskRadius: 0.5
+        blindDiskRadius: 0.1
         maxAdjDiff: -1.0
         pointAdjX2Y: 0.0
         pointAdjX2Z: 0.0
