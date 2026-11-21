@@ -40,21 +40,30 @@ const double PI = 3.1415926;
 
 double sensorOffsetX = 0;
 double sensorOffsetY = 0;
-double lookAheadDis = 0.3;
+double lookAheadDis = 0.15;
 double speed = 0.4;
-double accel = 1.0;
+double accel = 0.5;
 double yawRate = 0.6;
-double slowDis = 0.3;
+double slowDis = 0.4;
 double slowAngle = 0.3;
-double stopDis = 0.02;
+double stopDis = 0.05;
 double stopAngle = 0.04;
 double goalYawDis = 0.5;
+double minRelZ = -0.15;
+double maxRelZ = 1.5;
+double collisionRadiusFromLookAhead = 0.3;
+int collisionPointThre = 5;
+int collisionPointCount = 0;
+bool collisionStop = false;
 
 float vehicleX = 0;
 float vehicleY = 0;
 float vehicleZ = 0;
 float vehicleYaw = 0;
 float vehicleSpeed = 0;
+
+float lookAheadX = 0;
+float lookAheadY = 0;
 
 int pathSize = 0;
 int pathPointID = 1;
@@ -65,9 +74,13 @@ bool goalReach = false;
 
 double odomTime = 0;
 
+pcl::PointCloud<pcl::PointXYZI>::Ptr laserCloud(new pcl::PointCloud<pcl::PointXYZI>());
+pcl::PointCloud<pcl::PointXYZI>::Ptr laserCloudCrop(new pcl::PointCloud<pcl::PointXYZI>());
 pcl::PointCloud<pcl::PointXYZ>::Ptr path(new pcl::PointCloud<pcl::PointXYZ>());
+
 std_msgs::msg::Empty goalReachMsg;
 geometry_msgs::msg::PointStamped lookAheadMsgs;
+shared_ptr<rclcpp::Publisher<sensor_msgs::msg::PointCloud2>> pubLaserCloud;
 
 void odomHandler(const nav_msgs::msg::Odometry::ConstSharedPtr odomIn)
 {
@@ -81,6 +94,49 @@ void odomHandler(const nav_msgs::msg::Odometry::ConstSharedPtr odomIn)
   vehicleX = odomIn->pose.pose.position.x - cos(yaw) * sensorOffsetX + sin(yaw) * sensorOffsetY;
   vehicleY = odomIn->pose.pose.position.y - sin(yaw) * sensorOffsetX - cos(yaw) * sensorOffsetY;
   vehicleZ = odomIn->pose.pose.position.z;
+}
+
+void laserCloudHandler(const sensor_msgs::msg::PointCloud2::ConstSharedPtr laserCloud2) 
+{
+  if (odomTime <= 0 || pathSize <= 1 || !collisionStop) return;
+
+  laserCloud->clear();
+  pcl::fromROSMsg(*laserCloud2, *laserCloud);
+
+  float dis = sqrt(lookAheadX * lookAheadX + lookAheadY * lookAheadY);
+
+  if (dis < 0.001) dis = 0.001;
+  float sinLookAhead = lookAheadY / dis;
+  float cosLookAhead = lookAheadX / dis;
+
+  if (dis > lookAheadDis) dis = lookAheadDis;
+
+  laserCloudCrop->clear();
+  collisionPointCount = 0;
+  int laserCloudSize = laserCloud->points.size();
+  for (int i = 0; i < laserCloudSize; i++) {
+    float pointX1 = laserCloud->points[i].x - vehicleX;
+    float pointY1 = laserCloud->points[i].y - vehicleY;
+    float pointZ1 = laserCloud->points[i].z - vehicleZ;
+
+    float pointX2 = pointX1 * cosLookAhead + pointY1 * sinLookAhead;
+    float pointY2 = -pointX1 * sinLookAhead + pointY1 * cosLookAhead;
+    float pointZ2 = pointZ1;
+
+    float pointToLookAhead = sqrt((pointX2 - dis) * (pointX2 - dis) + pointY2 * pointY2);
+
+    if (((pointX2 > 0 && pointX2 < dis && fabs(pointY2) < collisionRadiusFromLookAhead) || 
+        (pointX2 >= dis && pointToLookAhead < collisionRadiusFromLookAhead)) && (pointZ2 > minRelZ && pointZ2 < maxRelZ)) {
+      laserCloudCrop->push_back(laserCloud->points[i]);
+      collisionPointCount++;
+    }
+  }
+
+  sensor_msgs::msg::PointCloud2 laserCloud3;
+  pcl::toROSMsg(*laserCloudCrop, laserCloud3);
+  laserCloud3.header.stamp = laserCloud2->header.stamp;
+  laserCloud3.header.frame_id = "map";
+  pubLaserCloud->publish(laserCloud3);
 }
 
 void pathHandler(const nav_msgs::msg::Path::ConstSharedPtr pathIn)
@@ -142,6 +198,11 @@ int main(int argc, char** argv)
   nh->declare_parameter<double>("stopDis", stopDis);
   nh->declare_parameter<double>("stopAngle", stopAngle);
   nh->declare_parameter<double>("goalYawDis", goalYawDis);
+  nh->declare_parameter<double>("minRelZ", minRelZ);
+  nh->declare_parameter<double>("maxRelZ", maxRelZ);
+  nh->declare_parameter<double>("collisionRadiusFromLookAhead", collisionRadiusFromLookAhead);
+  nh->declare_parameter<int>("collisionPointThre", collisionPointThre);
+  nh->declare_parameter<bool>("collisionStop", collisionStop);
 
   nh->get_parameter("sensorOffsetX", sensorOffsetX);
   nh->get_parameter("sensorOffsetY", sensorOffsetY);
@@ -154,8 +215,15 @@ int main(int argc, char** argv)
   nh->get_parameter("stopDis", stopDis);
   nh->get_parameter("stopAngle", stopAngle);
   nh->get_parameter("goalYawDis", goalYawDis);
+  nh->get_parameter("minRelZ", minRelZ);
+  nh->get_parameter("maxRelZ", maxRelZ);
+  nh->get_parameter("collisionRadiusFromLookAhead", collisionRadiusFromLookAhead);
+  nh->get_parameter("collisionPointThre", collisionPointThre);
+  nh->get_parameter("collisionStop", collisionStop);
 
   auto subOdom = nh->create_subscription<nav_msgs::msg::Odometry>("/state_estimation", 5, odomHandler);
+
+  auto subLaserCloud = nh->create_subscription<sensor_msgs::msg::PointCloud2>("/registered_scan", 5, laserCloudHandler);
 
   auto subPath = nh->create_subscription<nav_msgs::msg::Path>("/path", 5, pathHandler);
 
@@ -164,6 +232,8 @@ int main(int argc, char** argv)
   auto pubGoalReach = nh->create_publisher<std_msgs::msg::Empty>("/goal_reach", 5);
 
   auto pubLookAhead = nh->create_publisher<geometry_msgs::msg::PointStamped>("/look_ahead", 5);
+
+  pubLaserCloud = nh->create_publisher<sensor_msgs::msg::PointCloud2>("/collision_cloud", 5);
 
   rclcpp::Rate rate(100);
   bool status = rclcpp::ok();
@@ -201,13 +271,19 @@ int main(int argc, char** argv)
 
       //Add obstacle stopping, implement 1) or 2)
       /*if (disGoal > stopDis) {
-        1) Short distance obstacle checking - Note that disX and disY represent the vehicle moving direction, in a rectangle whose long direction is the vehicle moving direction and the width of the rectangle is the width of the vehicle, check if the number of registered lidar points (ground and ceiling removed) exceeds a threshold, if yes set speedRamped = 0.
+        1) Short distance obstacle checking - Note that lookAheadX and lookAheadY represent the vehicle moving direction, in a rectangle whose long direction is the vehicle moving direction and the width of the rectangle is the width of the vehicle, check if the number of registered lidar points (ground and ceiling removed) exceeds a threshold, if yes set speedRamped = 0.
         2) Long distance obstacle checking - Note that path->points[pathPointID] is the look ahead, take the path points within a certain range before and after the look ahead, check the number of registered lidar points (ground and ceiling removed) whose distances to the closest path points are less than the vehicle width / 2, if the number of registered lidar points exceeds a threshold, set speedRamped = 0.
       }*/
+
+      //Obstacle stopping 1) from laserCloudHandler() callback function
+      lookAheadX = disX;
+      lookAheadY = disY;
+      if (collisionPointCount >= collisionPointThre) speedRamped = 0;
 
       if (vehicleSpeed < speedRamped) vehicleSpeed += accel / 100.0;
       else if (vehicleSpeed > speedRamped) vehicleSpeed -= accel / 100.0;
 
+      if (dis < 0.001) dis = 0.001;
       float vehicleFwdSpeed = (disX * cos(vehicleYaw) + disY * sin(vehicleYaw)) / dis * vehicleSpeed;
       float vehicleLeftSpeed = (-disX * sin(vehicleYaw) + disY * cos(vehicleYaw)) / dis * vehicleSpeed;
 
@@ -224,6 +300,9 @@ int main(int argc, char** argv)
       if (disYaw < -slowAngle) vehicleYawRate = -yawRate;
       else if (disYaw > slowAngle) vehicleYawRate = yawRate;
 
+      //Obstacle stopping 1) from laserCloudHandler() callback function
+      if (collisionPointCount >= collisionPointThre) vehicleYawRate = 0;
+
       if (disGoal < stopDis && fabs(vehicleSpeed) < accel / 100.0 && fabs(disYaw) < stopAngle && !goalReach) {
         pubGoalReach->publish(goalReachMsg);
         goalReach = true;
@@ -236,8 +315,8 @@ int main(int argc, char** argv)
       cmd_vel.twist.linear.y = 0;
       cmd_vel.twist.angular.z = vehicleYawRate;
       if (fabs(vehicleSpeed) > accel / 100.0) {
-        cmd_vel.twist.linear.x = vehicleSpeed;
-        cmd_vel.twist.linear.y = 0;
+        cmd_vel.twist.linear.x = vehicleFwdSpeed;
+        cmd_vel.twist.linear.y = vehicleLeftSpeed;
       }
       pubSpeed->publish(cmd_vel);
       
